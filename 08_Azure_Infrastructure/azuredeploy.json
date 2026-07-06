@@ -1,0 +1,104 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "projectPrefix": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 10,
+            "metadata": {
+                "description": "Prefix for resource naming. Use lowercase letters and numbers only."
+            }
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "description": "Location for all resources."
+            }
+        },
+        "storageSku": {
+            "type": "string",
+            "defaultValue": "Standard_LRS",
+            "allowedValues": [
+                "Standard_LRS",
+                "Standard_GRS",
+                "Standard_ZRS"
+            ],
+            "metadata": {
+                "description": "Storage account SKU."
+            }
+        },
+        "databricksPricingTier": {
+            "type": "string",
+            "defaultValue": "premium",
+            "allowedValues": [
+                "standard",
+                "premium",
+                "trial"
+            ],
+            "metadata": {
+                "description": "The pricing tier of Azure Databricks workspace."
+            }
+        }
+    },
+    "variables": {
+        "storageAccountName": "[concat(tolower(parameters('projectPrefix')), 'adls', uniqueString(resourceGroup().id))]",
+        "databricksWorkspaceName": "[concat(parameters('projectPrefix'), '-databricks-', uniqueString(resourceGroup().id))]",
+        "dataFactoryName": "[concat(parameters('projectPrefix'), '-adf-', uniqueString(resourceGroup().id))]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2023-01-01",
+            "name": "[variables('storageAccountName')]",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "[parameters('storageSku')]"
+            },
+            "kind": "StorageV2",
+            "properties": {
+                "accessTier": "Hot",
+                "isHnsEnabled": true,
+                "supportsHttpsTrafficOnly": true,
+                "minimumTlsVersion": "TLS1_2"
+            }
+        },
+        {
+            "type": "Microsoft.Databricks/workspaces",
+            "apiVersion": "2023-02-01",
+            "name": "[variables('databricksWorkspaceName')]",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "[parameters('databricksPricingTier')]"
+            },
+            "properties": {
+                "managedResourceGroupId": "[concat(subscription().id, '/resourceGroups/', variables('databricksWorkspaceName'), '-managed-rg')]"
+            }
+        },
+        {
+            "type": "Microsoft.DataFactory/factories",
+            "apiVersion": "2018-06-01",
+            "name": "[variables('dataFactoryName')]",
+            "location": "[parameters('location')]",
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "properties": {}
+        }
+    ],
+    "outputs": {
+        "storageAccountNameOutput": {
+            "type": "string",
+            "value": "[variables('storageAccountName')]"
+        },
+        "databricksWorkspaceNameOutput": {
+            "type": "string",
+            "value": "[variables('databricksWorkspaceName')]"
+        },
+        "dataFactoryNameOutput": {
+            "type": "string",
+            "value": "[variables('dataFactoryName')]"
+        }
+    }
+}
