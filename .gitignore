@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Spark & Hadoop
+spark-warehouse/
+hadoop/
+data/
+derby.log
+metastore_db/
+
+# IDEs & System
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+.gemini/
