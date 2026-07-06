@@ -1,6 +1,5 @@
 # Azure Deployment Guide: Medallion ETL Pipelines (ADF, ADB, ADLS Gen2)
-
-This guide details the step-by-step process of deploying the E-Commerce and IoT Telemetry Medallion pipelines to Microsoft Azure.
+The step-by-step process of deploying the E-Commerce and IoT Telemetry Medallion pipelines to Microsoft Azure.
 
 ```mermaid
 graph TD
